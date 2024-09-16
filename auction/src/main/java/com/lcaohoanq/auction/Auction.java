@@ -1,15 +1,32 @@
 package com.lcaohoanq.auction;
 
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "auctions")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "auctions")
 public class Auction {
+
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String itemName;
     private double highestBid;
     private String highestBidder;
-    // getters and setters
+
+    // Getters and setters
 }
 

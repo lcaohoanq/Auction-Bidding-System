@@ -1,4 +1,16 @@
+#spring:
+  # data:
+  #   mongodb:
+  #     uri: mongodb://auctionadmin:auctionpass@localhost:27017/auctiondb
 spring:
-  data:
-    mongodb:
-      uri: mongodb://auctionadmin:auctionpass@localhost:27017/auctiondb
+  datasource:
+    url: jdbc:mysql://localhost:3303/auction_bidding_test
+    username: root
+    password: Luucaohoang1604^^
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true

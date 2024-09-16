@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class BidMessage {
-    private String auctionId;
+    private Long auctionId;
     private String bidder;
     private double amount;
     private String bidTime;

@@ -4,12 +4,13 @@ import AuctionForm from './AuctionForm';
 import BidList from './BidList';
 import HighestBid from './HighestBid';
 import { connectWebSocket, sendBid } from '../services/websocketService';
-import { Bid } from '../schemas/bid.schema';
+import { Auction, Bid } from '../schemas/bid.schema';
 
 const AuctionComponent: React.FC = () => {
   const [bids, setBids] = useState<Bid[]>([]);
   const [bidAmount, setBidAmount] = useState<string>('');
   const [username, setUsername] = useState<string>('');
+  const [auctions, setAuctions] = useState<Auction[]>([]);
 
   useEffect(() => {
     const disconnect = connectWebSocket((bidMessage: Bid) => {
@@ -17,6 +18,12 @@ const AuctionComponent: React.FC = () => {
     });
 
     return disconnect;
+  }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/auctions')
+      .then(response => response.json())
+      .then(data => setAuctions(data));
   }, []);
 
   const handleBidChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +46,7 @@ const AuctionComponent: React.FC = () => {
     }
   
     const bidMessage: Bid = {
-      auctionId: "someAuctionId", // You need to provide a real auction ID
+      auctionId: auctions[0]?.id || 1,
       bidder: username,
       amount: amount,
       bidTime: new Date().toISOString()
