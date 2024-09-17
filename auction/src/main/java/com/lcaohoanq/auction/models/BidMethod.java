@@ -22,7 +22,7 @@ public class BidMethod {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Enumerated(EnumType.ORDINAL)
     private BidMethodType name;

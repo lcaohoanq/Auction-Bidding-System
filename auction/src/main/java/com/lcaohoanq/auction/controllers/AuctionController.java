@@ -1,53 +1,103 @@
 package com.lcaohoanq.auction.controllers;
 
+import com.lcaohoanq.auction.dtos.AuctionDTO;
 import com.lcaohoanq.auction.models.Auction;
+import com.lcaohoanq.auction.models.AuctionParticipant;
 import com.lcaohoanq.auction.models.BidHistory;
-import com.lcaohoanq.auction.models.User;
-import com.lcaohoanq.auction.repositories.AuctionRepository;
-import com.lcaohoanq.auction.repositories.BidHistoryRepository;
-import com.lcaohoanq.auction.repositories.UserRepository;
 import com.lcaohoanq.auction.responses.BidMessage;
-import java.time.LocalDateTime;
+import com.lcaohoanq.auction.services.AuctionService;
+import com.lcaohoanq.auction.services.BidHistoryService;
+import com.lcaohoanq.auction.services.IAuctionParticipantService;
+import com.lcaohoanq.auction.services.IAuctionService;
+import com.lcaohoanq.auction.services.IBidHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
+@RequestMapping("/api/auctions")
 @RequiredArgsConstructor
 public class AuctionController {
 
-    private final AuctionRepository auctionRepository;
-    private final UserRepository userRepository;
-    private final BidHistoryRepository bidHistoryRepository;
+    private final IAuctionService auctionService;
+    private final IBidHistoryService bidHistoryService;
+    private final IAuctionParticipantService auctionParticipantService;
 
     @MessageMapping("/placeBid")
     @SendTo("/topic/auction")
-    public BidMessage bid(BidMessage message) throws Exception {
-        System.out.println("New bid received: " + message);
-        Auction auction = auctionRepository.findById(message.getAuctionId())
-            .orElseThrow(() -> new RuntimeException("Auction not found with id: " + message.getAuctionId()));
-        User user = userRepository.findById(message.getUserId())
-            .orElseThrow(() -> new RuntimeException("User not found with id: " + message.getUserId()));
-
-        if (message.getAmount() > auction.getHighestBid()) {
-            auction.setHighestBid(message.getAmount());
-            auctionRepository.save(auction);
-
-            BidHistory bidHistory = new BidHistory();
-            bidHistory.setAuction(auction);
-            bidHistory.setUser(user);
-            bidHistory.setBidAmount(message.getAmount());
-            bidHistory.setBidTime(LocalDateTime.now());
-            bidHistoryRepository.save(bidHistory);
-        }
+    public BidMessage bid(BidMessage message) {
+        BidHistory bidHistory = bidHistoryService.placeBid(message.getAuctionId(), message.getUserId(), message.getAmount());
+        message.setBidTime(bidHistory.getBidTime());
         return message;
     }
 
-    @GetMapping("")
-    public String index() {
-        return "Welcome to the auction!";
+    @PostMapping
+    public ResponseEntity<?> createAuction(@RequestBody AuctionDTO auctionDTO) {
+        return ResponseEntity.ok(auctionService.createAuction(auctionDTO));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Auction>> getAllAuctions() {
+        return ResponseEntity.ok(auctionService.getAllAuctions());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Auction> getAuctionById(@PathVariable Long id) {
+        return auctionService.getAuctionById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Auction> updateAuction(@PathVariable Long id,
+                                                 @RequestBody AuctionDTO auctionDTO) {
+        return ResponseEntity.ok(auctionService.updateAuction(id, auctionDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAuction(@PathVariable Long id) {
+        auctionService.deleteAuction(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/bids")
+    public ResponseEntity<List<BidHistory>> getBidHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(bidHistoryService.getBidHistoryForAuction(id));
+    }
+
+    @PostMapping("/{id}/join")
+    public ResponseEntity<Void> joinAuction(@PathVariable Long id, @RequestParam Long userId) {
+        auctionParticipantService.joinAuction(id, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<AuctionParticipant>> getAuctionParticipants(@PathVariable Long id) {
+        return ResponseEntity.ok(auctionParticipantService.getAuctionParticipants(id));
+    }
+
+    @PostMapping("/{id}/end")
+    public ResponseEntity<Void> endAuction(@PathVariable Long id) {
+        auctionService.endAuction(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<Auction>> getActiveAuctions() {
+        return ResponseEntity.ok(auctionService.getActiveAuctions());
+    }
+
+    @PostMapping("/{id}/bids")
+    public ResponseEntity<?> placeBid(@PathVariable Long id, @RequestBody BidMessage bidMessage) {
+        try{
+            BidHistory bidHistory = bidHistoryService.placeBid(id, bidMessage.getUserId(), bidMessage.getAmount());
+            return ResponseEntity.ok(bidHistory);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
-

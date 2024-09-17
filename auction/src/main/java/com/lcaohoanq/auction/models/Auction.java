@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "auctions")
 public class Auction {
 
@@ -36,10 +38,10 @@ public class Auction {
     @Column(name="bid_step")
     private int bidStep;
 
-    @Column(name="current_bid")
+    @Column(name="current_bid", columnDefinition = "int default 0")
     private int currentBid;
 
-    @Column(name="highest_bid")
+    @Column(name="highest_bid", columnDefinition = "int default 0")
     private int highestBid;
 
     @Column(name="start_time")
@@ -52,11 +54,15 @@ public class Auction {
     @JoinColumn(name="status_id")
     private AuctionStatus status;
 
-    public Auction(Long id, String title, String itemName, int highestBid){
+    public Auction(Long id, String title, String itemName, int bidStep, LocalDateTime startTime,
+                   LocalDateTime endTime, AuctionStatus status) {
         this.id = id;
         this.title = title;
         this.itemName = itemName;
-        this.highestBid = highestBid;
+        this.bidStep = bidStep;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.status = status;
     }
 
 }
