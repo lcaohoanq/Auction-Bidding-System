@@ -11,6 +11,7 @@ import com.lcaohoanq.auction.services.IAuctionParticipantService;
 import com.lcaohoanq.auction.services.IAuctionService;
 import com.lcaohoanq.auction.services.IBidHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -65,25 +66,41 @@ public class AuctionController {
     }
 
     @GetMapping("/{id}/bids")
-    public ResponseEntity<List<BidHistory>> getBidHistory(@PathVariable Long id) {
-        return ResponseEntity.ok(bidHistoryService.getBidHistoryForAuction(id));
+    public ResponseEntity<?> getBidHistory(@PathVariable Long id) {
+        try{
+            return ResponseEntity.ok(bidHistoryService.getBidHistoryForAuction(id));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/{id}/join")
-    public ResponseEntity<Void> joinAuction(@PathVariable Long id, @RequestParam Long userId) {
-        auctionParticipantService.joinAuction(id, userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> joinAuction(@PathVariable Long id, @RequestParam Long userId) {
+        try{
+            auctionParticipantService.joinAuction(id, userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}/participants")
-    public ResponseEntity<List<AuctionParticipant>> getAuctionParticipants(@PathVariable Long id) {
-        return ResponseEntity.ok(auctionParticipantService.getAuctionParticipants(id));
+    public ResponseEntity<?> getAuctionParticipants(@PathVariable Long id) {
+        try{
+            return ResponseEntity.ok(auctionParticipantService.getAuctionParticipants(id));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/{id}/end")
-    public ResponseEntity<Void> endAuction(@PathVariable Long id) {
-        auctionService.endAuction(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> endAuction(@PathVariable Long id) {
+        try{
+            auctionService.endAuction(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/active")
@@ -92,12 +109,29 @@ public class AuctionController {
     }
 
     @PostMapping("/{id}/bids")
-    public ResponseEntity<?> placeBid(@PathVariable Long id, @RequestBody BidMessage bidMessage) {
-        try{
-            BidHistory bidHistory = bidHistoryService.placeBid(id, bidMessage.getUserId(), bidMessage.getAmount());
+    public ResponseEntity<?> placeBid(@PathVariable Long id, @RequestBody BidMessage bidMessage, @RequestHeader("Authorization") String token) {
+        try {
+            // Validate the token (you'll need to implement this method)
+            Long userId = validateToken(token);
+            if (userId == null) {
+                return ResponseEntity.status(
+                    HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+            }
+
+            BidHistory bidHistory = bidHistoryService.placeBid(id, userId, bidMessage.getAmount());
             return ResponseEntity.ok(bidHistory);
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    private Long validateToken(String token) {
+        // Implement token validation logic here
+        // This is a placeholder implementation
+        String bearerToken = token.split(" ")[1];
+        if ("12345".equals(bearerToken)) {
+            return 1L; // Return the user ID associated with the token
+        }
+        return null;
     }
 }

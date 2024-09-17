@@ -1,6 +1,7 @@
 package com.lcaohoanq.auction.controllers;
 
 import com.lcaohoanq.auction.dtos.UserDTO;
+import com.lcaohoanq.auction.dtos.UserLoginDTO;
 import com.lcaohoanq.auction.models.User;
 import com.lcaohoanq.auction.services.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,16 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
         return ResponseEntity.ok(newUser);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO){
+        User user;
+        try{
+            user = userService.login(userLoginDTO);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Login successfully");
     }
 }

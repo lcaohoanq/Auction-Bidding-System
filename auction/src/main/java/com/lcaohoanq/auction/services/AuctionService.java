@@ -69,22 +69,6 @@ public class AuctionService implements IAuctionService {
         auctionRepository.deleteById(id);
     }
 
-    public BidHistory placeBid(Long auctionId, Long userId, double bidAmount) {
-        return bidHistoryService.placeBid(auctionId, userId, bidAmount);
-    }
-
-    public List<BidHistory> getBidHistoryForAuction(Long auctionId) {
-        return bidHistoryService.getBidHistoryForAuction(auctionId);
-    }
-
-    public AuctionParticipant joinAuction(Long auctionId, Long userId) {
-        return auctionParticipantService.joinAuction(auctionId, userId);
-    }
-
-    public List<AuctionParticipant> getAuctionParticipants(Long auctionId) {
-        return auctionParticipantService.getAuctionParticipants(auctionId);
-    }
-
     @Override
     public void endAuction(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)

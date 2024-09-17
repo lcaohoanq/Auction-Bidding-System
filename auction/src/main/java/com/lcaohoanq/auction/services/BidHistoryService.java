@@ -26,7 +26,6 @@ public class BidHistoryService implements IBidHistoryService {
     private final BidHistoryRepository bidHistoryRepository;
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
-    private final AuctionStatusRepository auctionStatusRepository;
 
     @Override
     public BidHistory placeBid(Long auctionId, Long userId, double bidAmount) {
@@ -43,14 +42,13 @@ public class BidHistoryService implements IBidHistoryService {
             throw new IllegalArgumentException("Auction is closed");
         }
 
-        //check if bid step is valid
         if (bidAmount % auction.getBidStep() != 0) {
             throw new IllegalArgumentException("Bid amount must be a multiple of the bid step, "
                                                    + "current bid step is: " + auction.getBidStep() + " Max bid amount is: " + auction.getHighestBid());
         }
 
         if (bidAmount <= auction.getHighestBid()) {
-            throw new IllegalArgumentException("Bid amount must be higher than the current highest bid");
+            throw new IllegalArgumentException("Bid amount must be higher than the current highest bid: " + " Max bid amount is: " + auction.getHighestBid());
         }
 
         auction.setHighestBid((int) bidAmount);
@@ -62,14 +60,18 @@ public class BidHistoryService implements IBidHistoryService {
         bidHistory.setBidAmount(bidAmount);
         bidHistory.setBidTime(LocalDateTime.now());
 
-        bidHistory = bidHistoryRepository.save(bidHistory);
-        return bidHistory;
+        return bidHistoryRepository.save(bidHistory);
     }
 
     @Override
     public List<BidHistory> getBidHistoryForAuction(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
             .orElseThrow(() -> new RuntimeException("Auction not found"));
+
+        if(auction.getStatus().getName() == Status.INCOMING) {
+            throw new IllegalArgumentException("Auction is not started yet");
+        }
+
         return bidHistoryRepository.findByAuctionOrderByBidTimeDesc(auction);
     }
 }

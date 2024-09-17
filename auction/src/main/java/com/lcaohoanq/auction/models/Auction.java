@@ -8,9 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,6 +56,14 @@ public class Auction {
     @ManyToOne
     @JoinColumn(name="status_id")
     private AuctionStatus status;
+
+    // Many-to-Many relationship with User through AuctionParticipant
+    @OneToMany(mappedBy = "auction")
+    private Set<AuctionParticipant> auctionParticipants;
+
+    // One-to-Many relationship with AuctionProduct
+    @OneToMany(mappedBy = "auction")
+    private Set<AuctionProduct> auctionProducts;
 
     public Auction(Long id, String title, String itemName, int bidStep, LocalDateTime startTime,
                    LocalDateTime endTime, AuctionStatus status) {

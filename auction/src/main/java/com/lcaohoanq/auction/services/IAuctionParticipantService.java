@@ -1,10 +1,9 @@
 package com.lcaohoanq.auction.services;
 
-import com.lcaohoanq.auction.dtos.AuctionParticipantDTO;
 import com.lcaohoanq.auction.models.AuctionParticipant;
-import java.util.List;
+import com.lcaohoanq.auction.responses.AuctionParticipantResponse;
 
 public interface IAuctionParticipantService {
     AuctionParticipant joinAuction(Long auctionId, Long userId);
-    List<AuctionParticipant> getAuctionParticipants(Long auctionId);
+    AuctionParticipantResponse getAuctionParticipants(Long auctionId);
 }

@@ -1,6 +1,7 @@
 package com.lcaohoanq.auction.models;
 
 import jakarta.persistence.*;
+import java.util.Set;
 import lombok.Data;
 
 @Entity
@@ -15,4 +16,8 @@ public class Product {
 
     @Column(name = "base_price")
     private double basePrice;
+
+    // One-to-Many relationship with AuctionProduct
+    @OneToMany(mappedBy = "product")
+    private Set<AuctionProduct> auctionProducts;
 }

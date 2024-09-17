@@ -1,6 +1,7 @@
 package com.lcaohoanq.auction.models;
 
 import jakarta.persistence.*;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +22,7 @@ public class User {
     @Column(name="email", unique = true)
     private String email;
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private Set<AuctionParticipant> auctionParticipants;
 }
