@@ -1,4 +1,4 @@
-package com.lcaohoanq.auction;
+package com.lcaohoanq.auction.configs;
 
 import java.util.Arrays;
 import java.util.List;

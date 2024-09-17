@@ -1,0 +1,63 @@
+package com.lcaohoanq.auction.models;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "auctions")
+public class Auction {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title; //Atumn asfasdfsdaf Auction
+
+    @Column(name="item_name")
+    private String itemName;
+
+    @Column(name="bid_step")
+    private int bidStep;
+
+    @Column(name="current_bid")
+    private int currentBid;
+
+    @Column(name="highest_bid")
+    private int highestBid;
+
+    @Column(name="start_time")
+    private LocalDateTime startTime;
+
+    @Column(name="end_time")
+    private LocalDateTime endTime;
+
+    @ManyToOne
+    @JoinColumn(name="status_id")
+    private AuctionStatus status;
+
+    public Auction(Long id, String title, String itemName, int highestBid){
+        this.id = id;
+        this.title = title;
+        this.itemName = itemName;
+        this.highestBid = highestBid;
+    }
+
+}
+

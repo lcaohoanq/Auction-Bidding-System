@@ -1,4 +1,4 @@
-package com.lcaohoanq.auction;
+package com.lcaohoanq.auction.configs;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

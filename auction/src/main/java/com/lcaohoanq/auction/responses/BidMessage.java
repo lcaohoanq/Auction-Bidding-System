@@ -1,5 +1,6 @@
 package com.lcaohoanq.auction.responses;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,8 +10,8 @@ import lombok.ToString;
 @ToString
 public class BidMessage {
     private Long auctionId;
-    private String bidder;
-    private double amount;
-    private String bidTime;
+    private Long userId;
+    private int amount;
+    private LocalDateTime bidTime;
 }
 

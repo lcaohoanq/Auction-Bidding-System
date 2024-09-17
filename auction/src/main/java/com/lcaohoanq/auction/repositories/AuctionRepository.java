@@ -1,7 +1,7 @@
-package com.lcaohoanq.auction;
+package com.lcaohoanq.auction.repositories;
 
+import com.lcaohoanq.auction.models.Auction;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
 }
